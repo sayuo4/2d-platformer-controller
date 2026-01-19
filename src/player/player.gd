@@ -30,6 +30,20 @@ extends CharacterBody2D
 @export_range(0.0, 1.0) var jump_time_to_land: float
 @export_range(1.0, 5.0) var max_up_velocity_ratio: float # Multiplied by jump_velocity
 
+@export_group("On Wall")
+@export_subgroup("Wall Slide")
+@export var max_wall_slide_speed: float
+@export_range(1.0, 2.0) var down_held_wall_slide_ratio: float
+@export var wall_slide_acc: float # Downward acceleration
+
+@export_subgroup("Wall Jump")
+@export_range(0.0, 1.0) var wall_jump_v_velocity_ratio: float # Multiplied by jump_velocity
+@export var wall_jump_h_velocity: float
+# Horizontal acceleration/deceleration after wall jumping.
+@export var wall_jumping_acc: float
+@export var wall_jumping_dec: float
+@export var wall_jumping_towards_wall_dec: float # While the player is moving towards the wall
+
 @onready var jump_velocity: float = -(2.0 * jump_height) / jump_time_to_peak
 @onready var max_up_velocity: float = jump_velocity * max_up_velocity_ratio
 @onready var max_h_velocity: float = max_speed * max_h_velocity_ratio
@@ -37,6 +51,7 @@ extends CharacterBody2D
 @onready var falling_gravity: float = (2.0 * jump_height) / (jump_time_to_land * jump_time_to_land)
 
 @onready var shape: Node2D = $Shape
+@onready var state_machine: StateMachine = $StateMachine
 
 func set_flip_h(value: bool) -> void:
 	if not is_node_ready():
@@ -94,3 +109,46 @@ func jump() -> void:
 func try_jump() -> void:
 	if Input.is_action_just_pressed("jump"):
 		jump()
+
+func get_last_wall_dir() -> float:
+	return -signf(get_wall_normal().x)
+
+func apply_wall_slide() -> void:
+	velocity.y = move_toward(velocity.y, calculate_wall_slide_speed(), wall_slide_acc)
+
+func can_wall_slide() -> bool:
+	var h_input_dir: float = signf(get_input_vector().x)
+	var wall_dir: float = get_last_wall_dir()
+	
+	# Can wall slide if the player is touching the wall and moving towards it.
+	return is_on_wall() and h_input_dir != 0 and h_input_dir == wall_dir
+
+func try_wall_slide() -> void:
+	if can_wall_slide():
+		state_machine.activate_state_by_name("WallSlideState")
+
+func calculate_wall_slide_speed() -> float:
+	return max_wall_slide_speed * (
+			down_held_wall_slide_ratio if Input.is_action_pressed("down")
+			else 1.0
+	)
+
+func wall_jump() -> void:
+	var wall_jump_dir: float = -get_last_wall_dir()
+	
+	velocity.y = jump_velocity * wall_jump_v_velocity_ratio
+	velocity.x = wall_jump_h_velocity * wall_jump_dir
+	
+	state_machine.activate_state_by_name("WallJumpState")
+
+func try_wall_jump() -> void:
+	if Input.is_action_just_pressed("jump") and is_on_wall():
+		wall_jump()
+
+func calculate_wall_jumping_dec() -> float:
+	var h_input_dir: float = signf(get_input_vector().x)
+	
+	return (
+			wall_jumping_towards_wall_dec if h_input_dir == get_last_wall_dir()
+			else wall_jumping_dec
+	)

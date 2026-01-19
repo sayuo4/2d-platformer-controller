@@ -4,6 +4,8 @@ extends PlayerState
 func _physics_update(delta: float) -> void:
 	player.apply_gravity(delta)
 	player.apply_movement(player.falling_acc, player.falling_dec)
+	player.try_wall_slide()
+	player.try_wall_jump()
 	player.update_flip_h()
 	
 	player.move_and_slide()

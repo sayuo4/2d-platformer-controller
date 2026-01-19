@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://ducp7rsjpf40n"]
+[gd_scene load_steps=14 format=3 uid="uid://ducp7rsjpf40n"]
 
 [ext_resource type="Script" uid="uid://spewh8xv7lts" path="res://src/player/player.gd" id="1_4anbu"]
 [ext_resource type="Script" uid="uid://bwbxypkqm7bgl" path="res://src/state_machine/state_machine.gd" id="2_rxibo"]
@@ -8,6 +8,8 @@
 [ext_resource type="Script" uid="uid://b6w2sn3ikefko" path="res://src/player/states/floor_entry_state.gd" id="6_ylhto"]
 [ext_resource type="Script" uid="uid://m06e3ohv0ud1" path="res://src/player/states/idle_state.gd" id="7_cwolq"]
 [ext_resource type="Script" uid="uid://bgrdchyvffn8v" path="res://src/player/states/run_state.gd" id="8_2smqc"]
+[ext_resource type="Script" uid="uid://b04xgcpknjjdw" path="res://src/player/states/wall_slide_state.gd" id="9_8ydov"]
+[ext_resource type="Script" uid="uid://d00j5gw538kn2" path="res://src/player/states/wall_jump_state.gd" id="10_ylhto"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_qnmj6"]
 size = Vector3(48, 64, 1)
@@ -20,6 +22,7 @@ size = Vector2(44, 62)
 
 [node name="Player" type="CharacterBody2D"]
 script = ExtResource("1_4anbu")
+flip_h = null
 max_speed = 450.0
 max_h_velocity_ratio = 3.0
 running_acc = 40.0
@@ -36,6 +39,14 @@ jump_height = 112.0
 jump_time_to_peak = 0.4
 jump_time_to_land = 0.3
 max_up_velocity_ratio = 3.0
+max_wall_slide_speed = 200.0
+down_held_wall_slide_ratio = 2.0
+wall_slide_acc = 50.0
+wall_jump_v_velocity_ratio = 0.8
+wall_jump_h_velocity = 400.0
+wall_jumping_acc = 34.0
+wall_jumping_dec = 32.0
+wall_jumping_towards_wall_dec = 26.0
 metadata/_edit_group_ = true
 
 [node name="Shape" type="Node2D" parent="."]
@@ -87,3 +98,11 @@ metadata/_custom_type_script = "uid://m06e3ohv0ud1"
 [node name="RunState" type="Node" parent="StateMachine/FloorEntryState"]
 script = ExtResource("8_2smqc")
 metadata/_custom_type_script = "uid://bgrdchyvffn8v"
+
+[node name="WallSlideState" type="Node" parent="StateMachine"]
+script = ExtResource("9_8ydov")
+metadata/_custom_type_script = "uid://b04xgcpknjjdw"
+
+[node name="WallJumpState" type="Node" parent="StateMachine"]
+script = ExtResource("10_ylhto")
+metadata/_custom_type_script = "uid://d00j5gw538kn2"
