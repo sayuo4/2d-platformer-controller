@@ -5,6 +5,7 @@ func _physics_update(delta: float) -> void:
 	player.apply_gravity(delta)
 	player.apply_movement(player.running_acc, player.running_dec)
 	player.try_jump()
+	player.try_dash()
 	
 	player.move_and_slide()
 	

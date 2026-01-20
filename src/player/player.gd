@@ -44,28 +44,40 @@ extends CharacterBody2D
 @export var wall_jumping_dec: float
 @export var wall_jumping_towards_wall_dec: float # While the player is moving towards the wall
 
+@export_group("Dash")
+@export var dash_speed: float
+@export var dash_distance: float
+@export var after_dash_speed: float
+@export_range(0.0, 1.0) var after_dash_gravity_ratio: float
+
+var dash_allowed: bool = false
+
 @onready var jump_velocity: float = -(2.0 * jump_height) / jump_time_to_peak
 @onready var max_up_velocity: float = jump_velocity * max_up_velocity_ratio
 @onready var max_h_velocity: float = max_speed * max_h_velocity_ratio
 @onready var jumping_gravity: float = (2.0 * jump_height) / (jump_time_to_peak * jump_time_to_peak)
 @onready var falling_gravity: float = (2.0 * jump_height) / (jump_time_to_land * jump_time_to_land)
 
-@onready var shape: Node2D = $Shape
-@onready var state_machine: StateMachine = $StateMachine
+@onready var shape: Node2D = $Shape as Node2D
+@onready var state_machine: StateMachine = $StateMachine as StateMachine
+@onready var dash_cooldown_timer: Timer = %DashCooldown as Timer
+@onready var after_dash_gravity_timer: Timer = %AfterDashGravity as Timer
+
+func get_facing_dir() -> float:
+	return -1.0 if flip_h else 1.0
 
 func set_flip_h(value: bool) -> void:
 	if not is_node_ready():
 		await ready
 	
 	flip_h = value
-	
-	shape.scale.x = absf(shape.scale.x) * (-1.0 if flip_h else 1.0)
+	shape.scale.x = absf(shape.scale.x) * get_facing_dir()
 
 func update_flip_h() -> void:
 	var h_input_dir: float = signf(get_input_vector().x)
 	
 	if h_input_dir:
-		flip_h = h_input_dir != 1
+		flip_h = h_input_dir != 1.0
 
 func get_input_vector() -> Vector2:
 	return Input.get_vector("left", "right", "up", "down")
@@ -92,7 +104,8 @@ func get_default_gravity() -> float:
 
 func calculate_gravity() -> float:
 	return get_default_gravity() * (
-			jump_not_held_gravity_ratio if not Input.is_action_pressed("jump")
+			after_dash_gravity_ratio if not after_dash_gravity_timer.is_stopped()
+			else jump_not_held_gravity_ratio if not Input.is_action_pressed("jump")
 			else down_held_gravity_ratio if Input.is_action_pressed("down") and velocity.y > 0
 			else 1.0
 	)
@@ -139,7 +152,7 @@ func wall_jump() -> void:
 	velocity.y = jump_velocity * wall_jump_v_velocity_ratio
 	velocity.x = wall_jump_h_velocity * wall_jump_dir
 	
-	state_machine.activate_state_by_name("WallJumpState")
+	state_machine.activate_state_by_name.call_deferred("WallJumpState")
 
 func try_wall_jump() -> void:
 	if Input.is_action_just_pressed("jump") and is_on_wall():
@@ -152,3 +165,10 @@ func calculate_wall_jumping_dec() -> float:
 			wall_jumping_towards_wall_dec if h_input_dir == get_last_wall_dir()
 			else wall_jumping_dec
 	)
+
+func can_dash() -> bool:
+	return dash_allowed and dash_cooldown_timer.is_stopped()
+
+func try_dash() -> void:
+	if Input.is_action_just_pressed("dash") and can_dash():
+		state_machine.activate_state_by_name.call_deferred("DashState")
