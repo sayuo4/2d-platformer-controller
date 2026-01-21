@@ -5,24 +5,24 @@ A feature-rich 2D platformer controller made in [Godot Engine](https://godotengi
 - **Basic movement with Acceleration and Deceleration**
 
 - **Jump with Variable Jump Height**<br>
-  ![Jump Example](media/jump_example.gif)
+  ![Jump Example](.gdignore/GIFs/jump_example.gif)
 
 - **Coyote Time and Jump Buffering for both Floor and Wall Jumps**<br>
-  ![Coyote Time Example](media/coyote_time_example.gif)
+  ![Coyote Time Example](.gdignore/GIFs/coyote_time_example.gif)
 
 - **Speed Boost and Gravity Adjustment at Jump Peak**
 
 - **Wall Slide and Wall jump**<br>
-  ![Wall Jump Example](media/wall_jump_example.gif)
+  ![Wall Jump Example](.gdignore/GIFs/wall_jump_example.gif)
 
 - **Dash**<br>
-  ![Dash Example](media/dash_example.gif)
+  ![Dash Example](.gdignore/GIFs/dash_example.gif)
 
 - **Corner Correction**<br>
-  ![Corner Correction Example](media/corner_correction_example.gif)
+  ![Corner Correction Example](.gdignore/GIFs/corner_correction_example.gif)
 
 - **One-Way Platform Assist**<br>
-  ![One-Way Platform Example](media/oneway_platform_example.gif)
+  ![One-Way Platform Example](.gdignore/GIFs/oneway_platform_example.gif)
 
 ## Requirements
 - **[Godot Engine v4.5.1-stable](https://github.com/godotengine/godot/releases/tag/4.5.1-stable)**
