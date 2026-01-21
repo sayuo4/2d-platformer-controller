@@ -1,6 +1,9 @@
 class_name WallSlideState
 extends PlayerState
 
+func _enter(_previous_state: State) -> void:
+	player.dash_allowed = true
+
 func _physics_update(_delta: float) -> void:
 	player.apply_wall_slide()
 	player.try_wall_jump()
