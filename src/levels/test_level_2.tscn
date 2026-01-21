@@ -1,0 +1,123 @@
+[gd_scene load_steps=10 format=3 uid="uid://c0v8g5uy7d0ib"]
+
+[ext_resource type="PackedScene" uid="uid://ducp7rsjpf40n" path="res://src/player/player.tscn" id="1_j82m2"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_b0ile"]
+size = Vector3(1280, 48, 1)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_b0ile"]
+size = Vector2(1280, 48)
+
+[sub_resource type="BoxMesh" id="BoxMesh_j82m2"]
+size = Vector3(48, 192, 1)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_gd2id"]
+size = Vector2(48, 192)
+
+[sub_resource type="BoxMesh" id="BoxMesh_rh0rp"]
+size = Vector3(192, 48, 1)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_j82m2"]
+size = Vector2(192, 48)
+
+[sub_resource type="BoxMesh" id="BoxMesh_gd2id"]
+size = Vector3(192, 16, 1)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_rh0rp"]
+size = Vector2(192, 16)
+
+[node name="TestLevel2" type="Node2D"]
+metadata/_edit_lock_ = true
+
+[node name="Floor1" type="StaticBody2D" parent="."]
+position = Vector2(640, 667)
+metadata/_edit_group_ = true
+
+[node name="MeshInstance2D" type="MeshInstance2D" parent="Floor1"]
+self_modulate = Color(0, 0, 0, 1)
+mesh = SubResource("BoxMesh_b0ile")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Floor1"]
+shape = SubResource("RectangleShape2D_b0ile")
+
+[node name="Wall1" type="StaticBody2D" parent="."]
+position = Vector2(836, 454)
+metadata/_edit_group_ = true
+
+[node name="MeshInstance2D" type="MeshInstance2D" parent="Wall1"]
+self_modulate = Color(0, 0, 0, 1)
+mesh = SubResource("BoxMesh_j82m2")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Wall1"]
+shape = SubResource("RectangleShape2D_gd2id")
+
+[node name="Wall2" type="StaticBody2D" parent="."]
+position = Vector2(1034, 454)
+metadata/_edit_group_ = true
+
+[node name="MeshInstance2D" type="MeshInstance2D" parent="Wall2"]
+self_modulate = Color(0, 0, 0, 1)
+mesh = SubResource("BoxMesh_j82m2")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Wall2"]
+shape = SubResource("RectangleShape2D_gd2id")
+
+[node name="Wall3" type="StaticBody2D" parent="."]
+position = Vector2(1108, 454)
+metadata/_edit_group_ = true
+
+[node name="MeshInstance2D" type="MeshInstance2D" parent="Wall3"]
+self_modulate = Color(0, 0, 0, 1)
+mesh = SubResource("BoxMesh_j82m2")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Wall3"]
+shape = SubResource("RectangleShape2D_gd2id")
+
+[node name="Ceiling1" type="StaticBody2D" parent="."]
+position = Vector2(465, 399)
+metadata/_edit_group_ = true
+
+[node name="MeshInstance2D" type="MeshInstance2D" parent="Ceiling1"]
+self_modulate = Color(0, 0, 0, 1)
+mesh = SubResource("BoxMesh_rh0rp")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Ceiling1"]
+shape = SubResource("RectangleShape2D_j82m2")
+
+[node name="OneWayPlatform1" type="StaticBody2D" parent="."]
+position = Vector2(464, 532)
+metadata/_edit_group_ = true
+
+[node name="MeshInstance2D" type="MeshInstance2D" parent="OneWayPlatform1"]
+self_modulate = Color(0, 0, 0, 1)
+mesh = SubResource("BoxMesh_gd2id")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="OneWayPlatform1"]
+shape = SubResource("RectangleShape2D_rh0rp")
+one_way_collision = true
+
+[node name="Ceiling2" type="StaticBody2D" parent="."]
+position = Vector2(682, 438)
+metadata/_edit_group_ = true
+
+[node name="MeshInstance2D" type="MeshInstance2D" parent="Ceiling2"]
+self_modulate = Color(0, 0, 0, 1)
+mesh = SubResource("BoxMesh_rh0rp")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Ceiling2"]
+shape = SubResource("RectangleShape2D_j82m2")
+
+[node name="OneWayPlatform2" type="StaticBody2D" parent="."]
+position = Vector2(681, 532)
+metadata/_edit_group_ = true
+
+[node name="MeshInstance2D" type="MeshInstance2D" parent="OneWayPlatform2"]
+self_modulate = Color(0, 0, 0, 1)
+mesh = SubResource("BoxMesh_gd2id")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="OneWayPlatform2"]
+shape = SubResource("RectangleShape2D_rh0rp")
+one_way_collision = true
+
+[node name="Player" parent="." instance=ExtResource("1_j82m2")]
+position = Vector2(763, 642)

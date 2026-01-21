@@ -34,6 +34,8 @@ signal wall_exited
 @export_range(1.0, 5.0) var max_up_velocity_ratio: float # Multiplied by jump_velocity
 @export var jump_peak_boost: float # Boost applied to horizontal velocity after reaching jump peak
 @export_range(0.0, 1.0) var jump_peak_gravity_ratio: float
+@export var corner_correction_distance: float
+@export var oneway_platform_assist_distance: float
 
 @export_group("On Wall")
 @export_subgroup("Wall Slide")
@@ -71,6 +73,7 @@ var _on_wall: bool = false: # This variable mustn't be edited manually
 
 @onready var shape: Node2D = $Shape as Node2D
 @onready var state_machine: StateMachine = $StateMachine as StateMachine
+@onready var collision_shape: CollisionShape2D = $CollisionShape2D as CollisionShape2D
 
 @onready var jump_peak_gravity_timer: Timer = %JumpPeakGravity as Timer
 @onready var jump_coyote_timer: Timer = %JumpCoyote as Timer
@@ -169,11 +172,8 @@ func apply_wall_slide() -> void:
 	velocity.y = move_toward(velocity.y, calculate_wall_slide_speed(), wall_slide_acc)
 
 func can_wall_slide() -> bool:
-	var h_input_dir: float = signf(get_input_vector().x)
-	var wall_dir: float = get_last_wall_dir()
-	
 	# Can wall slide if the player is touching the wall and moving towards it.
-	return is_on_wall() and h_input_dir != 0 and h_input_dir == wall_dir
+	return is_on_wall() and get_input_vector().x * get_last_wall_dir() > 0
 
 func try_wall_slide() -> void:
 	if can_wall_slide():
@@ -226,3 +226,44 @@ func can_dash() -> bool:
 func try_dash() -> void:
 	if Input.is_action_just_pressed("dash") and can_dash():
 		state_machine.activate_state_by_name.call_deferred("DashState")
+
+func try_corner_correction(delta: float) -> void:
+	var v_motion: Vector2 = Vector2(0.0, velocity.y * delta)
+	
+	if not test_move(global_transform, v_motion):
+		return
+	
+	# Multiplied by 2 so each offset increments by 0.5 instead of 1.0.
+	for offset_step: int in range(1, corner_correction_distance * 2 + 1):
+		var offset: float = offset_step / 2.0
+	
+		for dir: float in [-1.0, 1.0]:
+			var h_offset: Vector2 = Vector2(offset * dir, 0)
+			var test_transform: Transform2D = global_transform.translated(h_offset)
+			
+			if not test_move(test_transform, v_motion):
+				translate(h_offset)
+				
+				# Stop the player if they are moving opposite to the corner's direction.
+				if velocity.x * dir < 0.0:
+					velocity.x = 0.0
+				
+				return
+
+func try_oneway_platform_assist() -> void:
+	if test_move(global_transform, Vector2.DOWN):
+		return
+	
+	# Multiplied by 2 so each offset increments by 0.5 instead of 1.0.
+	for offset_step: int in range(oneway_platform_assist_distance * 2 + 1):
+		var offset: float = offset_step / 2.0
+		var v_offset: Vector2 = Vector2.UP * offset
+		
+		var test_transform: Transform2D = global_transform.translated(v_offset)
+		
+		if test_move(test_transform, Vector2.DOWN):
+			# Make sure the player doesn't get stuck.
+			if not test_move(test_transform, Vector2.UP):
+				translate(v_offset)
+			
+			return
