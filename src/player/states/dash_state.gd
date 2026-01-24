@@ -28,6 +28,6 @@ func _physics_update(_delta: float) -> void:
 	player.move_and_slide()
 	
 	if (start_pos.distance_to(player.global_position) >= player.dash_distance
-		or signf(player.velocity.x) != signf(dash_dir) # If velocity's horizontal direction has changed
+		or player.get_slide_collision_count() > 0
 	):
 		switch_to("AirEntryState")
