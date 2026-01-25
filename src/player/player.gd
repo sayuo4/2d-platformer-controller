@@ -11,14 +11,14 @@ signal wall_exited
 @export_range(1.0, 5.0) var max_h_velocity_ratio: float # Multiplied by max_speed
 
 @export_subgroup("On Floor")
-@export var running_acc: float
-@export var running_dec: float
+@export_range(0.0, 1.0) var running_acc_time: float
+@export_range(0.0, 1.0) var running_dec_time: float
 
 @export_subgroup("In Air")
-@export var jumping_acc: float
-@export var jumping_dec: float
-@export var falling_acc: float
-@export var falling_dec: float
+@export_range(0.0, 1.0) var jumping_acc_time: float
+@export_range(0.0, 1.0) var jumping_dec_time: float
+@export_range(0.0, 1.0) var falling_acc_time: float
+@export_range(0.0, 1.0) var falling_dec_time: float
 
 @export_group("Vertical Movement")
 @export_subgroup("Gravity")
@@ -41,15 +41,15 @@ signal wall_exited
 @export_subgroup("Wall Slide")
 @export var max_wall_slide_speed: float
 @export_range(1.0, 2.0) var down_held_wall_slide_ratio: float
-@export var wall_slide_acc: float # Downward acceleration
+@export_range(0.0, 1.0) var wall_slide_acc_time: float # Downward acceleration
 
 @export_subgroup("Wall Jump")
 @export_range(0.0, 1.0) var wall_jump_v_velocity_ratio: float # Multiplied by jump_velocity
 @export var wall_jump_h_velocity: float
 # Horizontal acceleration/deceleration after wall jumping.
-@export var wall_jumping_acc: float
-@export var wall_jumping_dec: float
-@export var wall_jumping_towards_wall_dec: float # While the player is moving towards the wall
+@export_range(0.0, 1.0) var wall_jumping_acc_time: float
+@export_range(0.0, 1.0) var wall_jumping_dec_time: float
+@export_range(0.0, 1.0) var wall_jumping_towards_wall_dec_time: float # While the player is moving towards the wall
 
 @export_group("Dash")
 @export var dash_speed: float
@@ -121,17 +121,17 @@ func update_flip_h() -> void:
 func get_input_vector() -> Vector2:
 	return Input.get_vector("left", "right", "up", "down")
 
-func apply_movement(acc: float, dec: float) -> void:
-	var speed: float = max_speed * get_input_vector().x
+func apply_movement(delta: float, acc_time: float, dec_time: float) -> void:
+	var speed_dir: float = max_speed * get_input_vector().x
 	var h_velocity_dir: float = signf(velocity.x)
 	var apply_acc: bool = (
 			h_velocity_dir == 0.0
-			or (velocity.x - speed) * h_velocity_dir <= 0.0
+			or (velocity.x - speed_dir) * h_velocity_dir <= 0.0
 	)
 	
-	var step: float = acc if apply_acc else dec
+	var step: float = max_speed / (acc_time if apply_acc else dec_time)
 	
-	velocity.x = move_toward(velocity.x, speed, step)
+	velocity.x = move_toward(velocity.x, speed_dir, step * delta)
 	velocity.x = clampf(velocity.x, -max_h_velocity, max_h_velocity)
 
 func apply_gravity(delta: float) -> void:
@@ -185,8 +185,9 @@ func stop_jump_timers() -> void:
 func get_last_wall_dir() -> float:
 	return -signf(get_wall_normal().x)
 
-func apply_wall_slide() -> void:
-	velocity.y = move_toward(velocity.y, calculate_wall_slide_speed(), wall_slide_acc)
+func apply_wall_slide(delta: float) -> void:
+	var step: float = max_wall_slide_speed / wall_slide_acc_time
+	velocity.y = move_toward(velocity.y, calculate_wall_slide_speed(), step * delta)
 
 func can_wall_slide() -> bool:
 	# Can wall slide if the player is touching the wall and moving towards it.
@@ -230,12 +231,12 @@ func _on_wall_entered() -> void:
 func _on_wall_exited() -> void:
 	wall_jump_coyote_timer.start()
 
-func calculate_wall_jumping_dec() -> float:
+func calculate_wall_jumping_dec_time() -> float:
 	var h_input_dir: float = signf(get_input_vector().x)
 	
 	return (
-			wall_jumping_towards_wall_dec if h_input_dir == get_last_wall_dir()
-			else wall_jumping_dec
+			wall_jumping_towards_wall_dec_time if h_input_dir == get_last_wall_dir()
+			else wall_jumping_dec_time
 	)
 
 func can_dash() -> bool:

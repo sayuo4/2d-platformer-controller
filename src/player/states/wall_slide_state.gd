@@ -4,8 +4,8 @@ extends PlayerState
 func _enter(_previous_state: State) -> void:
 	player.dash_allowed = true
 
-func _physics_update(_delta: float) -> void:
-	player.apply_wall_slide()
+func _physics_update(delta: float) -> void:
+	player.apply_wall_slide(delta)
 	player.try_wall_jump()
 	player.try_dash()
 	player.apply_move_anim()
