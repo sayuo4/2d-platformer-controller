@@ -229,7 +229,8 @@ func _on_wall_entered() -> void:
 		wall_jump()
 
 func _on_wall_exited() -> void:
-	wall_jump_coyote_timer.start()
+	if velocity.y > 0:
+		wall_jump_coyote_timer.start()
 
 func calculate_wall_jumping_dec_time() -> float:
 	var h_input_dir: float = signf(get_input_vector().x)
