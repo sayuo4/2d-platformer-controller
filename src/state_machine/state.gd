@@ -16,7 +16,7 @@ func force_switch_to(state_name: StringName, pass_as_previous: State = null) -> 
 ## Switches to the given state at the end of the current frame if this state is active.
 func switch_to(state_name: StringName, pass_as_previous: State = null) -> void:
 	if is_active():
-		force_switch_to.call_deferred(state_name, pass_as_previous)
+		force_switch_to(state_name, pass_as_previous)
 
 func force_deactivate() -> void:
 	_deactivate_state_callable.call()
@@ -24,7 +24,7 @@ func force_deactivate() -> void:
 ## Deactivates this state at the end of the current frame.
 func deactivate() -> void:
 	if is_active():
-		force_deactivate.call_deferred()
+		force_deactivate()
 
 ## Called when the state machine managing this node is ready. This method is meant to be overriden.
 func _state_machine_ready() -> void:

@@ -210,7 +210,7 @@ func wall_jump() -> void:
 	velocity.x = wall_jump_h_velocity * wall_jump_dir
 	apply_stretch()
 	
-	state_machine.activate_state_by_name.call_deferred("WallJumpState")
+	state_machine.activate_state_by_name("WallJumpState")
 
 func try_wall_jump(ignore_wall: bool = false) -> void:
 	if Input.is_action_just_pressed("jump") and (is_on_wall() or ignore_wall):
@@ -245,7 +245,7 @@ func can_dash() -> bool:
 
 func try_dash() -> void:
 	if Input.is_action_just_pressed("dash") and can_dash():
-		state_machine.activate_state_by_name.call_deferred("DashState")
+		state_machine.activate_state_by_name("DashState")
 
 func try_corner_correction(delta: float) -> void:
 	var v_motion: Vector2 = Vector2(0.0, velocity.y * delta)
